@@ -31,6 +31,9 @@
 module thread_select_stage(
     input                              clk,
     input                              reset,
+    
+    // From cache_interface
+    input                              pipeline_stall,
 
     // From instruction_decode_stage
     input decoded_instruction_t        id_instruction,
@@ -162,7 +165,7 @@ module thread_select_stage(
             // This signal goes back to the ifetch_tag_stage to enable fetching more
             // instructions. Deassert fetch enable a few cycles before the FIFO
             // fills up because there are several stages in-between.
-            assign ts_fetch_en[thread_idx] = !ififo_almost_full && thread_en[thread_idx];
+            assign ts_fetch_en[thread_idx] = !ififo_almost_full && thread_en[thread_idx] && !pipeline_stall;
 
             /// XXX Treat PC specially for scoreboard?
 
@@ -211,7 +214,7 @@ module thread_select_stage(
             // instruction FIFO to determine the scoreboard values. Registered them
             // here.
             assign instruction_latch_en = !ififo_empty && (!instruction_latched
-                || issue_last_subcycle[thread_idx]);
+                || issue_last_subcycle[thread_idx]) && !pipeline_stall;
 
             always_ff @(posedge clk)
             begin

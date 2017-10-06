@@ -318,6 +318,7 @@ module core
     register_idx_t      wb_writeback_reg;       // From writeback_stage of writeback_stage.v
     thread_idx_t        wb_writeback_thread_idx;// From writeback_stage of writeback_stage.v
     vector_t            wb_writeback_value;     // From writeback_stage of writeback_stage.v
+    logic               pipeline_stall;          // From cache_interface of cache_interface.sv
     // End of automatics
 
     //
@@ -337,6 +338,7 @@ module core
     fp_execute_stage4 fp_execute_stage4(.*);
     fp_execute_stage5 fp_execute_stage5(.*);
     writeback_stage writeback_stage(.*);
+    cache_interface cache_interface(.*);
 
     control_registers #(
         .CORE_ID(CORE_ID),
